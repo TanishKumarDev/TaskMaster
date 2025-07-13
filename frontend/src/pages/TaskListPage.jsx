@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 
 const TaskListPage = () => {
@@ -48,6 +48,14 @@ const TaskListPage = () => {
                 <p className="text-gray-600 dark:text-gray-300">
                   Due: {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date'}
                 </p>
+                <div className="mt-4">
+                  <Link
+                    to={`/edit-task/${task._id}`}
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                  >
+                    Edit
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
