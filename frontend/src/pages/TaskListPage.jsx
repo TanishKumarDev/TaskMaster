@@ -4,6 +4,7 @@ import axios from 'axios';
 
 const TaskListPage = () => {
   const [tasks, setTasks] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -15,7 +16,10 @@ const TaskListPage = () => {
           navigate('/login');
           return;
         }
-        const response = await axios.get('http://localhost:3000/api/tasks', {
+        const url = searchQuery
+          ? `http://localhost:3000/api/tasks/search?query=${searchQuery}`
+          : 'http://localhost:3000/api/tasks';
+        const response = await axios.get(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setTasks(response.data.tasks);
@@ -24,7 +28,7 @@ const TaskListPage = () => {
       }
     };
     fetchTasks();
-  }, [navigate]);
+  }, [navigate, searchQuery]);
 
   const handleDelete = async (id) => {
     try {
@@ -47,6 +51,15 @@ const TaskListPage = () => {
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-4 text-center text-gray-900 dark:text-white">TaskMaster Dashboard</h1>
         <p className="text-gray-600 dark:text-gray-300 mb-6 text-center">Manage your tasks here!</p>
+        <div className="mb-6">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search tasks by title or description..."
+            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+          />
+        </div>
         {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
         {tasks.length === 0 ? (
           <p className="text-gray-600 dark:text-gray-300 text-center">No tasks found.</p>
