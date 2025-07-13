@@ -26,6 +26,22 @@ const TaskListPage = () => {
     fetchTasks();
   }, [navigate]);
 
+  const handleDelete = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+      await axios.delete(`http://localhost:3000/api/tasks/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTasks(tasks.filter((task) => task._id !== id));
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to delete task');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
       <div className="max-w-4xl mx-auto">
@@ -48,13 +64,19 @@ const TaskListPage = () => {
                 <p className="text-gray-600 dark:text-gray-300">
                   Due: {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date'}
                 </p>
-                <div className="mt-4">
+                <div className="mt-4 flex gap-4">
                   <Link
                     to={`/edit-task/${task._id}`}
                     className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                   >
                     Edit
                   </Link>
+                  <button
+                    onClick={() => handleDelete(task._id)}
+                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             ))}
