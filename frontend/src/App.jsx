@@ -5,8 +5,9 @@ import SignupPage from './pages/SignupPage';
 import TaskListPage from './pages/TaskListPage';
 import CreateTaskPage from './pages/CreateTaskPage';
 import EditTaskPage from './pages/EditTaskPage';
-import Navbar from './components/Navbar';
 import CreateSubTaskPage from './pages/CreateSubTaskPage';
+import EditSubTaskPage from './pages/EditSubTaskPage';
+import Navbar from './components/Navbar';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/create-task" element={<CreateTaskPage />} />
         <Route path="/edit-task/:id" element={<EditTaskPage />} />
         <Route path="/create-subtask/:taskId" element={<CreateSubTaskPage />} />
+        <Route path="/edit-subtask/:taskId/:subTaskId" element={<EditSubTaskPage />} />
       </Routes>
     </div>
   );
