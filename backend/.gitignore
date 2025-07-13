@@ -1,0 +1,36 @@
+# Node.js dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pids/
+*.pid
+*.pid.lock
+
+# Runtime data
+pids/
+*.pid
+*.pid.lock
+
+# Dependency directories
+/.pnp
+.pnp.js
+
+# Build directories
+build/
+dist/
+
+# Tests
+coverage/
+
