@@ -5,8 +5,8 @@ import axios from 'axios';
 const EditTaskPage = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState('Low');
-  const [status, setStatus] = useState('Pending');
+  const [priority, setPriority] = useState('medium');
+  const [status, setStatus] = useState('todo');
   const [dueDate, setDueDate] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -99,9 +99,9 @@ const EditTaskPage = () => {
               onChange={(e) => setStatus(e.target.value)}
               className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
             >
-              <option value="Pending">Pending</option>
-              <option value="InProgress">In Progress</option>
-              <option value="Completed">Completed</option>
+              <option value="todo">Todo</option>
+              <option value="in-progress">In Progress</option>
+              <option value="completed">Completed</option>
             </select>
           </div>
           <div className="mb-6">
