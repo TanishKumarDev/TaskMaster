@@ -37,9 +37,11 @@ const taskSchema = new mongoose.Schema({
     },
     status: {
       type: String,
-      enum: ['todo', 'completed', 'in-progress'],
+       enum: ['todo', 'in-progress', 'completed'],
       default: 'todo',
+      set: (val) => val?.toLowerCase().trim(),
     },
+    
     createdAt: {
       type: Date,
       default: Date.now,
