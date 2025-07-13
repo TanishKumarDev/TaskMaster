@@ -77,6 +77,18 @@ const TaskListPage = () => {
                 <p className="text-gray-600 dark:text-gray-300">
                   Due: {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date'}
                 </p>
+                {task.subTasks && task.subTasks.length > 0 && (
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Sub-Tasks</h3>
+                    <ul className="list-disc pl-5 text-gray-600 dark:text-gray-300">
+                      {task.subTasks.map((subTask) => (
+                        <li key={subTask._id}>
+                          {subTask.title} - {subTask.status}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
                 <div className="mt-4 flex gap-4">
                   <Link
                     to={`/edit-task/${task._id}`}
@@ -90,6 +102,12 @@ const TaskListPage = () => {
                   >
                     Delete
                   </button>
+                  <Link
+                    to={`/create-subtask/${task._id}`}
+                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                  >
+                    Add Sub-Task
+                  </Link>
                 </div>
               </div>
             ))}
