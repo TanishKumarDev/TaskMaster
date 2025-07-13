@@ -21,12 +21,20 @@ const Navbar = () => {
             Home
           </Link>
           {token && (
-            <Link
-              to="/tasks"
-              className="text-gray-700 dark:text-gray-200 font-medium hover:text-blue-500 dark:hover:text-blue-400"
-            >
-              Dashboard
-            </Link>
+            <>
+              <Link
+                to="/tasks"
+                className="text-gray-700 dark:text-gray-200 font-medium hover:text-blue-500 dark:hover:text-blue-400"
+              >
+                Dashboard
+              </Link>
+              <Link
+                to="/create-task"
+                className="text-gray-700 dark:text-gray-200 font-medium hover:text-blue-500 dark:hover:text-blue-400"
+              >
+                Create Task
+              </Link>
+            </>
           )}
         </div>
         {token ? (
