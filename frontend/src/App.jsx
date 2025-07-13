@@ -6,6 +6,7 @@ import TaskListPage from './pages/TaskListPage';
 import CreateTaskPage from './pages/CreateTaskPage';
 import EditTaskPage from './pages/EditTaskPage';
 import Navbar from './components/Navbar';
+import CreateSubTaskPage from './pages/CreateSubTaskPage';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/tasks" element={<TaskListPage />} />
         <Route path="/create-task" element={<CreateTaskPage />} />
         <Route path="/edit-task/:id" element={<EditTaskPage />} />
+        <Route path="/create-subtask/:taskId" element={<CreateSubTaskPage />} />
       </Routes>
     </div>
   );
