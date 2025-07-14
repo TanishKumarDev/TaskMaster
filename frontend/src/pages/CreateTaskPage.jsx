@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const CreateSubTaskPage = () => {
+const CreateTaskPage = () => {
   const [title, setTitle] = useState('');
-  const [status, setStatus] = useState('todo');
+  const [description, setDescription] = useState('');
+  const [priority, setPriority] = useState('Medium');
+  const [status, setStatus] = useState('Todo');
+  const [dueDate, setDueDate] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { taskId } = useParams();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,25 +20,25 @@ const CreateSubTaskPage = () => {
         return;
       }
       await axios.post(
-        `http://localhost:3000/api/tasks/${taskId}/subtasks`,
-        { title, status },
+        'http://localhost:3000/api/tasks',
+        { title, description, priority, status, dueDate },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       navigate('/tasks');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create sub-task');
+      setError(err.response?.data?.message || 'Failed to create task');
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
       <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg max-w-md w-full">
-        <h1 className="text-3xl font-bold mb-4 text-center text-gray-900 dark:text-white">Create Sub-Task</h1>
-        <p className="text-gray-600 dark:text-gray-300 mb-6 text-center">Add a sub-task to your task!</p>
+        <h1 className="text-3xl font-bold mb-4 text-center text-gray-900 dark:text-white">Create New Task</h1>
+        <p className="text-gray-600 dark:text-gray-300 mb-6 text-center">Add a new task to TaskMaster!</p>
         {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700 dark:text-gray-300 mb-2">Sub-Task Title</label>
+            <label className="block text-gray-700 dark:text-gray-300 mb-2">Title</label>
             <input
               type="text"
               value={title}
@@ -45,23 +47,52 @@ const CreateSubTaskPage = () => {
               required
             />
           </div>
-          <div className="mb-6">
+          <div className="mb-4">
+            <label className="block text-gray-700 dark:text-gray-300 mb-2">Description</label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 dark:text-gray-300 mb-2">Priority</label>
+            <select
+              value={priority}
+              onChange={(e) => setPriority(e.target.value)}
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+            >
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+          <div className="mb-4">
             <label className="block text-gray-700 dark:text-gray-300 mb-2">Status</label>
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
               className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
             >
-              <option value="todo">Todo</option>
-              <option value="in-progress">In Progress</option>
-              <option value="completed">Completed</option>
+              <option value="Todo">Todo</option>
+              <option value="InProgress">In Progress</option>
+              <option value="Completed">Completed</option>
             </select>
+          </div>
+          <div className="mb-6">
+            <label className="block text-gray-700 dark:text-gray-300 mb-2">Due Date</label>
+            <input
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+            />
           </div>
           <button
             type="submit"
             className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
-            Create Sub-Task
+            Create Task
           </button>
         </form>
       </div>
@@ -69,4 +100,4 @@ const CreateSubTaskPage = () => {
   );
 };
 
-export default CreateSubTaskPage;
+export default CreateTaskPage;
