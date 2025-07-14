@@ -5,13 +5,22 @@ import axios from 'axios';
 const EditTaskPage = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState('medium');
-  const [status, setStatus] = useState('todo');
+  const [priority, setPriority] = useState('Medium');
+  const [status, setStatus] = useState('Todo');
   const [dueDate, setDueDate] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { id } = useParams();
 
+  // Validate taskId on mount
+  useEffect(() => {
+    if (!id || id === 'undefined') {
+      setError('Invalid task ID');
+      navigate('/tasks');
+    }
+  }, [id, navigate]);
+
+  // Fetch task details
   useEffect(() => {
     const fetchTask = async () => {
       try {
@@ -28,12 +37,14 @@ const EditTaskPage = () => {
         setDescription(task.description || '');
         setPriority(task.priority);
         setStatus(task.status);
-        setDueDate(task.dueDate ? task.dueDate.split('T')[0] : '');
+        setDueDate(task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '');
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to fetch task');
       }
     };
-    fetchTask();
+    if (id) {
+      fetchTask();
+    }
   }, [id, navigate]);
 
   const handleSubmit = async (e) => {
@@ -87,9 +98,9 @@ const EditTaskPage = () => {
               onChange={(e) => setPriority(e.target.value)}
               className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
             >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
             </select>
           </div>
           <div className="mb-4">
@@ -99,9 +110,9 @@ const EditTaskPage = () => {
               onChange={(e) => setStatus(e.target.value)}
               className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
             >
-              <option value="todo">Todo</option>
-              <option value="in-progress">In Progress</option>
-              <option value="completed">Completed</option>
+              <option value="Todo">Todo</option>
+              <option value="InProgress">In Progress</option>
+              <option value="Completed">Completed</option>
             </select>
           </div>
           <div className="mb-6">
@@ -115,7 +126,8 @@ const EditTaskPage = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
+            disabled={!id || id === 'undefined'}
           >
             Update Task
           </button>
