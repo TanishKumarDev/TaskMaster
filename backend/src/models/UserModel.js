@@ -20,7 +20,6 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-
 // Hash password before saving to database
 userSchema.pre('save', async function (next) {
     if(!this.isModified('password')) {
@@ -38,4 +37,4 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 
 // Create model
 const User = mongoose.model("User", userSchema);
-export default User;    
+export default User;
