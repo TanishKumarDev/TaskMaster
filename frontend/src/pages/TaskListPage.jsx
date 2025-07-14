@@ -9,62 +9,59 @@ const TaskListPage = () => {
   const [sortBy, setSortBy] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   // Map backend enums to display values
   const priorityDisplay = {
-    low: 'Low',
-    medium: 'Medium',
-    high: 'High',
+    Low: 'Low',
+    Medium: 'Medium',
+    High: 'High',
   };
   const statusDisplay = {
-    todo: 'Todo',
-    'in-progress': 'In Progress',
-    completed: 'Completed',
+    Todo: 'Todo',
+    InProgress: 'In Progress',
+    Completed: 'Completed',
   };
 
   useEffect(() => {
     const fetchTasks = async () => {
       try {
+        setIsLoading(true);
         const token = localStorage.getItem('token');
         if (!token) {
           navigate('/login');
           return;
         }
-        const url = searchQuery
-          ? `http://localhost:3000/api/tasks/search?query=${searchQuery}`
+        const queryParams = new URLSearchParams();
+        if (searchQuery) queryParams.append('query', searchQuery);
+        if (filterStatus) queryParams.append('status', filterStatus);
+        if (sortBy) queryParams.append('sort', sortBy);
+        
+        const url = searchQuery || filterStatus || sortBy
+          ? `http://localhost:3000/api/tasks/search?${queryParams.toString()}`
           : 'http://localhost:3000/api/tasks';
         const response = await axios.get(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setAllTasks(response.data.tasks);
+        setTasks(response.data.tasks);
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to fetch tasks');
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchTasks();
-  }, [navigate, searchQuery]);
-
-  useEffect(() => {
-    let filteredTasks = [...allTasks];
-    if (filterStatus) {
-      filteredTasks = filteredTasks.filter((task) => task.status === filterStatus);
-    }
-    if (sortBy === 'priority') {
-      filteredTasks.sort((a, b) => {
-        const priorityOrder = { high: 3, medium: 2, low: 1 };
-        return priorityOrder[b.priority] - priorityOrder[a.priority];
-      });
-    } else if (sortBy === 'dueDate') {
-      filteredTasks.sort((a, b) => {
-        return (a.dueDate || '9999-12-31') > (b.dueDate || '9999-12-31') ? 1 : -1;
-      });
-    }
-    setTasks(filteredTasks);
-  }, [allTasks, sortBy, filterStatus]);
+  }, [navigate, searchQuery, filterStatus, sortBy]);
 
   const handleDelete = async (id) => {
+    if (!id || id === 'undefined') {
+      setError('Invalid task ID');
+      return;
+    }
     try {
+      setIsLoading(true);
       const token = localStorage.getItem('token');
       if (!token) {
         navigate('/login');
@@ -76,11 +73,18 @@ const TaskListPage = () => {
       setAllTasks(allTasks.filter((task) => task._id !== id));
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to delete task');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleDeleteSubTask = async (taskId, subTaskId) => {
+    if (!taskId || taskId === 'undefined' || !subTaskId || subTaskId === 'undefined') {
+      setError('Invalid task or sub-task ID');
+      return;
+    }
     try {
+      setIsLoading(true);
       const token = localStorage.getItem('token');
       if (!token) {
         navigate('/login');
@@ -98,6 +102,8 @@ const TaskListPage = () => {
       );
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to delete sub-task');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -113,11 +119,15 @@ const TaskListPage = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search tasks by title or description..."
             className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+            disabled={isLoading}
+            aria-label="Search tasks"
           />
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
             className="p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+            disabled={isLoading}
+            aria-label="Sort tasks"
           >
             <option value="">Sort By</option>
             <option value="priority">Priority</option>
@@ -127,15 +137,19 @@ const TaskListPage = () => {
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
             className="p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+            disabled={isLoading}
+            aria-label="Filter by status"
           >
             <option value="">All Status</option>
-            <option value="todo">Todo</option>
-            <option value="in-progress">In Progress</option>
-            <option value="completed">Completed</option>
+            <option value="Todo">Todo</option>
+            <option value="InProgress">In Progress</option>
+            <option value="Completed">Completed</option>
           </select>
         </div>
         {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
-        {tasks.length === 0 ? (
+        {isLoading ? (
+          <p className="text-gray-600 dark:text-gray-300 text-center">Loading tasks...</p>
+        ) : tasks.length === 0 ? (
           <p className="text-gray-600 dark:text-gray-300 text-center">No tasks found.</p>
         ) : (
           <div className="grid gap-4">
@@ -162,12 +176,15 @@ const TaskListPage = () => {
                             <Link
                               to={`/edit-subtask/${task._id}/${subTask._id}`}
                               className="text-blue-500 hover:underline"
+                              aria-label={`Edit sub-task ${subTask.title}`}
                             >
                               Edit
                             </Link>
                             <button
                               onClick={() => handleDeleteSubTask(task._id, subTask._id)}
                               className="text-red-500 hover:underline"
+                              disabled={isLoading}
+                              aria-label={`Delete sub-task ${subTask.title}`}
                             >
                               Delete
                             </button>
@@ -181,18 +198,22 @@ const TaskListPage = () => {
                   <Link
                     to={`/edit-task/${task._id}`}
                     className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    aria-label={`Edit task ${task.title}`}
                   >
                     Edit
                   </Link>
                   <button
                     onClick={() => handleDelete(task._id)}
                     className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                    disabled={isLoading}
+                    aria-label={`Delete task ${task.title}`}
                   >
                     Delete
                   </button>
                   <Link
                     to={`/create-subtask/${task._id}`}
                     className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                    aria-label={`Add sub-task to ${task.title}`}
                   >
                     Add Sub-Task
                   </Link>
