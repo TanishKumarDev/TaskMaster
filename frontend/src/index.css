@@ -1,28 +1,48 @@
 @import "tailwindcss";
+
+/* Base styles */
 :root {
-  @apply bg-gray-100 text-gray-900 transition-colors duration-300;
+  --bg-color: #f7fafc;
+  --text-color: #1a202c;
+  --input-bg: #ffffff;
+  --border-color: #e2e8f0;
+  --button-bg: #3b82f6;
+  --button-hover-bg: #2563eb;
 }
 
+/* Light mode */
+.light {
+  --bg-color: #f7fafc;
+  --text-color: #1a202c;
+  --input-bg: #ffffff;
+  --border-color: #e2e8f0;
+}
+
+/* Dark mode */
 .dark {
-  @apply bg-gray-900 text-white;
+  --bg-color: #1a202c;
+  --text-color: #e2e8f0;
+  --input-bg: #2d3748;
+  --border-color: #4a5568;
+  --button-bg: #4a5568;
+  --button-hover-bg: #718096;
 }
 
-.dark input {
-  @apply bg-gray-800 border-gray-600 text-white;
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
-.dark button:not(.bg-blue-500):not(.bg-green-500) {
-  @apply bg-gray-800 border-gray-600 text-white;
+input, textarea, select {
+  background-color: var(--input-bg);
+  border-color: var(--border-color);
+  color: var(--text-color);
 }
 
-.dark .bg-white {
-  @apply bg-gray-800;
+button {
+  background-color: var(--button-bg);
 }
 
-.dark .text-gray-600 {
-  @apply text-gray-300;
-}
-
-.dark .text-gray-700 {
-  @apply text-gray-200;
+button:hover {
+  background-color: var(--button-hover-bg);
 }
