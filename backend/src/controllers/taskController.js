@@ -187,7 +187,7 @@ export const updateTask = async (req, res) => {
     if (subTasks) task.subTasks = subTasks;
 
     await task.save();
-    res.status(201).json(task);
+    res.status(200).json(task); // Changed from 201 to 200
   } catch (error) {
     console.error(`Error in updateTask: ${error.message}`);
     res.status(400).json({ message: error.message });
@@ -352,6 +352,28 @@ export const searchTasks = async (req, res) => {
     });
   } catch (error) {
     console.error(`Error in searchTasks: ${error.message}`);
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// Get a specific sub-task
+export const getSubTask = async (req, res) => {
+  try {
+    const { taskId, subTaskId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(taskId) || !mongoose.Types.ObjectId.isValid(subTaskId)) {
+      return res.status(400).json({ message: 'Invalid task or sub-task ID' });
+    }
+    const task = await Task.findOne({ _id: taskId, user: req.user });
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found or not authorized' });
+    }
+    const subTask = task.subTasks.id(subTaskId);
+    if (!subTask) {
+      return res.status(404).json({ message: 'Sub-task not found' });
+    }
+    res.json(subTask);
+  } catch (error) {
+    console.error(`Error in getSubTask: ${error.message}`);
     res.status(400).json({ message: error.message });
   }
 };
