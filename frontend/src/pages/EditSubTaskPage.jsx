@@ -4,11 +4,20 @@ import axios from 'axios';
 
 const EditSubTaskPage = () => {
   const [title, setTitle] = useState('');
-  const [status, setStatus] = useState('todo');
+  const [status, setStatus] = useState('Todo');
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { taskId, subTaskId } = useParams();
 
+  // Validate taskId and subTaskId on mount
+  useEffect(() => {
+    if (!taskId || taskId === 'undefined' || !subTaskId || subTaskId === 'undefined') {
+      setError('Invalid task or sub-task ID');
+      navigate('/tasks');
+    }
+  }, [taskId, subTaskId, navigate]);
+
+  // Fetch sub-task details
   useEffect(() => {
     const fetchSubTask = async () => {
       try {
@@ -17,18 +26,25 @@ const EditSubTaskPage = () => {
           navigate('/login');
           return;
         }
+        // Fallback: Fetch from parent task if direct sub-task endpoint not available
         const response = await axios.get(
-          `http://localhost:3000/api/tasks/${taskId}/subtasks/${subTaskId}`,
+          `http://localhost:3000/api/tasks/${taskId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        const subTask = response.data;
+        const task = response.data;
+        const subTask = task.subTasks.find(st => st._id.toString() === subTaskId);
+        if (!subTask) {
+          throw new Error('Sub-task not found');
+        }
         setTitle(subTask.title);
         setStatus(subTask.status);
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to fetch sub-task');
+        setError(err.response?.data?.message || err.message || 'Failed to fetch sub-task');
       }
     };
-    fetchSubTask();
+    if (taskId && subTaskId) {
+      fetchSubTask();
+    }
   }, [taskId, subTaskId, navigate]);
 
   const handleSubmit = async (e) => {
@@ -74,14 +90,15 @@ const EditSubTaskPage = () => {
               onChange={(e) => setStatus(e.target.value)}
               className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
             >
-              <option value="todo">Todo</option>
-              <option value="in-progress">In Progress</option>
-              <option value="completed">Completed</option>
+              <option value="Todo">Todo</option>
+              <option value="InProgress">In Progress</option>
+              <option value="Completed">Completed</option>
             </select>
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
+            disabled={!taskId || !subTaskId || taskId === 'undefined' || subTaskId === 'undefined'}
           >
             Update Sub-Task
           </button>
