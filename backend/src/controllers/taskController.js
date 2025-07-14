@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Task from '../models/TaskModel.js';
 
 // Create a new task with validation
@@ -9,8 +10,8 @@ export const createTask = async (req, res) => {
     if (!title || title.trim().length === 0) {
       return res.status(400).json({ message: 'Title is required and cannot be empty' });
     }
-    if (priority && !['high', 'medium', 'low'].includes(priority)) {
-      return res.status(400).json({ message: 'Priority must be high, medium, or low' });
+    if (priority && !['Low', 'Medium', 'High'].includes(priority)) {
+      return res.status(400).json({ message: 'Priority must be Low, Medium, or High' });
     }
     if (dueDate) {
       if (isNaN(Date.parse(dueDate))) {
@@ -31,7 +32,7 @@ export const createTask = async (req, res) => {
         if (!subTask.title || subTask.title.trim().length === 0) {
           return res.status(400).json({ message: 'Sub-task title is required and cannot be empty' });
         }
-        if (subTask.status && !['todo', 'in-progress', 'completed'].includes(subTask.status)) {
+        if (subTask.status && !['Todo', 'InProgress', 'Completed'].includes(subTask.status)) {
           return res.status(400).json({ message: 'Invalid sub-task status' });
         }
       }
@@ -40,7 +41,7 @@ export const createTask = async (req, res) => {
     const task = await Task.create({
       title: title.trim(),
       description: description ? description.trim() : description,
-      priority: priority || 'medium',
+      priority: priority || 'Medium',
       dueDate: dueDate ? new Date(dueDate) : null,
       user: req.user,
       subTasks: subTasks || [],
@@ -61,13 +62,13 @@ export const getTasks = async (req, res) => {
     // Build query object
     const query = { user: req.user };
     if (priority) {
-      if (!['high', 'medium', 'low'].includes(priority)) {
+      if (!['Low', 'Medium', 'High'].includes(priority)) {
         return res.status(400).json({ message: 'Invalid priority value' });
       }
       query.priority = priority;
     }
     if (status) {
-      if (!['todo', 'in-progress', 'completed'].includes(status)) {
+      if (!['Todo', 'InProgress', 'Completed'].includes(status)) {
         return res.status(400).json({ message: 'Invalid status value' });
       }
       query.status = status;
@@ -142,10 +143,10 @@ export const updateTask = async (req, res) => {
     if (title && title.trim().length === 0) {
       return res.status(400).json({ message: 'Title cannot be empty' });
     }
-    if (priority && !['high', 'medium', 'low'].includes(priority)) {
+    if (priority && !['Low', 'Medium', 'High'].includes(priority)) {
       return res.status(400).json({ message: 'Invalid priority value' });
     }
-    if (status && !['todo', 'in-progress', 'completed'].includes(status)) {
+    if (status && !['Todo', 'InProgress', 'Completed'].includes(status)) {
       return res.status(400).json({ message: 'Invalid status value' });
     }
     if (dueDate) {
@@ -167,7 +168,7 @@ export const updateTask = async (req, res) => {
         if (!subTask.title || subTask.title.trim().length === 0) {
           return res.status(400).json({ message: 'Sub-task title is required and cannot be empty' });
         }
-        if (subTask.status && !['todo', 'in-progress', 'completed'].includes(subTask.status)) {
+        if (subTask.status && !['Todo', 'InProgress', 'Completed'].includes(subTask.status)) {
           return res.status(400).json({ message: 'Invalid sub-task status' });
         }
       }
@@ -186,7 +187,7 @@ export const updateTask = async (req, res) => {
     if (subTasks) task.subTasks = subTasks;
 
     await task.save();
-    res.json(task);
+    res.status(201).json(task);
   } catch (error) {
     console.error(`Error in updateTask: ${error.message}`);
     res.status(400).json({ message: error.message });
@@ -213,11 +214,16 @@ export const addSubTask = async (req, res) => {
     const { taskId } = req.params;
     const { title, status } = req.body;
 
+    // Validate taskId
+    if (!taskId || !mongoose.Types.ObjectId.isValid(taskId)) {
+      return res.status(400).json({ message: 'Invalid task ID' });
+    }
+
     // Validate input
     if (!title || title.trim().length === 0) {
       return res.status(400).json({ message: 'Sub-task title is required and cannot be empty' });
     }
-    if (status && !['todo', 'in-progress', 'completed'].includes(status)) {
+    if (status && !['Todo', 'InProgress', 'Completed'].includes(status)) {
       return res.status(400).json({ message: 'Invalid sub-task status' });
     }
 
@@ -230,7 +236,7 @@ export const addSubTask = async (req, res) => {
       return res.status(400).json({ message: 'Cannot add more than 10 sub-tasks' });
     }
 
-    task.subTasks.push({ title: title.trim(), status: status || 'todo' });
+    task.subTasks.push({ title: title.trim(), status: status || 'Todo' });
     await task.save();
 
     res.status(201).json(task);
@@ -246,7 +252,12 @@ export const updateSubTask = async (req, res) => {
     const { taskId, subTaskId } = req.params;
     const { status } = req.body;
 
-    if (status && !['todo', 'in-progress', 'completed'].includes(status)) {
+    // Validate taskId
+    if (!taskId || !mongoose.Types.ObjectId.isValid(taskId)) {
+      return res.status(400).json({ message: 'Invalid task ID' });
+    }
+
+    if (status && !['Todo', 'InProgress', 'Completed'].includes(status)) {
       return res.status(400).json({ message: 'Invalid sub-task status' });
     }
 
@@ -274,6 +285,11 @@ export const updateSubTask = async (req, res) => {
 export const deleteSubTask = async (req, res) => {
   try {
     const { taskId, subTaskId } = req.params;
+
+    // Validate taskId
+    if (!taskId || !mongoose.Types.ObjectId.isValid(taskId)) {
+      return res.status(400).json({ message: 'Invalid task ID' });
+    }
 
     const task = await Task.findOne({ _id: taskId, user: req.user });
     if (!task) {
