@@ -6,17 +6,28 @@ const ThemeContext = createContext();
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState('light');
 
+  // Load theme from localStorage on mount
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    setTheme(savedTheme);
-    document.documentElement.className = savedTheme;
+    const savedTheme = localStorage.getItem('theme');
+    const validTheme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'light';
+    setTheme(validTheme);
+    document.documentElement.classList.add(validTheme);
   }, []);
+
+  // Sync theme changes to DOM
+  useEffect(() => {
+    document.documentElement.classList.remove('light', 'dark');
+    document.documentElement.classList.add(theme);
+    try {
+      localStorage.setItem('theme', theme);
+    } catch (err) {
+      console.error(`Error saving theme to localStorage: ${err.message}`);
+    }
+  }, [theme]);
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    document.documentElement.className = newTheme;
   };
 
   return (
