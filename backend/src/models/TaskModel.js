@@ -13,16 +13,16 @@ const taskSchema = new mongoose.Schema({
   },
   priority: {
     type: String,
-    enum: ['low', 'medium', 'high'],
-    default: 'medium',
+    enum: ['Low', 'Medium', 'High'],
+    default: 'Medium',
   },
   dueDate: {
     type: Date,
   },
   status: {
     type: String,
-    enum: ['todo', 'in-progress', 'completed'],
-    default: 'todo',
+    enum: ['Todo', 'InProgress', 'Completed'],
+    default: 'Todo',
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -37,11 +37,9 @@ const taskSchema = new mongoose.Schema({
     },
     status: {
       type: String,
-       enum: ['todo', 'in-progress', 'completed'],
-      default: 'todo',
-      set: (val) => val?.toLowerCase().trim(),
+      enum: ['Todo', 'InProgress', 'Completed'],
+      default: 'Todo',
     },
-    
     createdAt: {
       type: Date,
       default: Date.now,
