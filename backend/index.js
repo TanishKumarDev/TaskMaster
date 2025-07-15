@@ -12,7 +12,7 @@ app.use(express.json()); // Parse JSON bodies
 
 // Enable CORS for frontend origin
 app.use(cors({
-  origin: 'https://vercel.com/tanish-kumars-projects/task-master-frontend', // Allow requests from frontend
+  origin: 'https://task-master-frontend-two-phi.vercel.app/', // Allow requests from frontend
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed methods
   allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
 }));
