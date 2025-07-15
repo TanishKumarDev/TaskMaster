@@ -12,10 +12,13 @@ app.use(express.json()); // Parse JSON bodies
 
 // Enable CORS for frontend origin
 app.use(cors({
-  origin: 'https://task-master-frontend-two-phi.vercel.app', // Allow requests from frontend
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+  origin: [
+    'https://task-master-frontend-two-phi.vercel.app',
+    'http://localhost:5173'
+  ],
+  credentials: true,
 }));
+
 
 // Connect to MongoDB
 connectDB();
