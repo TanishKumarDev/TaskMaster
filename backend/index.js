@@ -13,7 +13,7 @@ app.use(express.json()); // Parse JSON bodies
 // Enable CORS for frontend origin
 app.use(cors({
   origin: [
-    'https://task-master-sandy-nine.vercel.app',
+    'https://task-master-ivory.vercel.app/',
     'http://localhost:5173'
   ],
   credentials: true,
