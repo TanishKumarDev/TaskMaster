@@ -12,7 +12,7 @@ app.use(express.json()); // Parse JSON bodies
 
 // Enable CORS for frontend origin
 app.use(cors({
-  origin: 'http://localhost:5173', // Allow requests from frontend
+  origin: 'https://taskmaster-backend-6x6a.onrender.com/', // Allow requests from frontend
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed methods
   allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
 }));
