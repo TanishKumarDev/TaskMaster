@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import { getTasks, deleteTask, searchTasks, deleteSubTask } from '../api/taskApi';
 
 const TaskListPage = () => {
   const [tasks, setTasks] = useState([]);
@@ -33,19 +33,14 @@ const TaskListPage = () => {
           navigate('/login');
           return;
         }
-        const queryParams = new URLSearchParams();
-        if (searchQuery) queryParams.append('query', searchQuery);
-        if (filterStatus) queryParams.append('status', filterStatus);
-        if (sortBy) queryParams.append('sort', sortBy);
-        
-        const url = searchQuery || filterStatus || sortBy
-          ? `http://localhost:3000/api/tasks/search?${queryParams.toString()}`
-          : 'http://localhost:3000/api/tasks';
-        const response = await axios.get(url, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setAllTasks(response.data.tasks);
-        setTasks(response.data.tasks);
+        let data;
+        if (searchQuery || filterStatus || sortBy) {
+          data = await searchTasks(searchQuery, { status: filterStatus, sort: sortBy });
+        } else {
+          data = await getTasks();
+        }
+        setAllTasks(data.tasks);
+        setTasks(data.tasks);
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to fetch tasks');
       } finally {
@@ -62,14 +57,7 @@ const TaskListPage = () => {
     }
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-      await axios.delete(`http://localhost:3000/api/tasks/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await deleteTask(id);
       setAllTasks(allTasks.filter((task) => task._id !== id));
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to delete task');
@@ -85,14 +73,7 @@ const TaskListPage = () => {
     }
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-      await axios.delete(`http://localhost:3000/api/tasks/${taskId}/subtasks/${subTaskId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await deleteSubTask(taskId, subTaskId);
       setAllTasks(
         allTasks.map((task) =>
           task._id === taskId

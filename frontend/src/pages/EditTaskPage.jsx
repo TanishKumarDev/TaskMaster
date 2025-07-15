@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import { getTasks, updateTask } from '../api/taskApi';
 
 const EditTaskPage = () => {
   const [title, setTitle] = useState('');
@@ -29,10 +29,12 @@ const EditTaskPage = () => {
           navigate('/login');
           return;
         }
-        const response = await axios.get(`http://localhost:3000/api/tasks/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const task = response.data;
+        const data = await getTasks();
+        const task = data.tasks.find((t) => t._id === id);
+        if (!task) {
+          setError('Task not found');
+          return;
+        }
         setTitle(task.title);
         setDescription(task.description || '');
         setPriority(task.priority);
@@ -55,11 +57,7 @@ const EditTaskPage = () => {
         navigate('/login');
         return;
       }
-      await axios.put(
-        `http://localhost:3000/api/tasks/${id}`,
-        { title, description, priority, status, dueDate },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await updateTask(id, { title, description, priority, status, dueDate });
       navigate('/tasks');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update task');

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import { getSubTask, updateSubTask } from '../api/taskApi';
 
 const EditSubTaskPage = () => {
   const [title, setTitle] = useState('');
@@ -26,16 +26,7 @@ const EditSubTaskPage = () => {
           navigate('/login');
           return;
         }
-        // Fallback: Fetch from parent task if direct sub-task endpoint not available
-        const response = await axios.get(
-          `http://localhost:3000/api/tasks/${taskId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        const task = response.data;
-        const subTask = task.subTasks.find(st => st._id.toString() === subTaskId);
-        if (!subTask) {
-          throw new Error('Sub-task not found');
-        }
+        const subTask = await getSubTask(taskId, subTaskId);
         setTitle(subTask.title);
         setStatus(subTask.status);
       } catch (err) {
@@ -55,11 +46,7 @@ const EditSubTaskPage = () => {
         navigate('/login');
         return;
       }
-      await axios.put(
-        `http://localhost:3000/api/tasks/${taskId}/subtasks/${subTaskId}`,
-        { title, status },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await updateSubTask(taskId, subTaskId, { title, status });
       navigate('/tasks');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update sub-task');

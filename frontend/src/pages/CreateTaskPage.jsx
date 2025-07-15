@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { createTask } from '../api/taskApi';
 
 const CreateTaskPage = () => {
   const [title, setTitle] = useState('');
@@ -19,11 +19,7 @@ const CreateTaskPage = () => {
         navigate('/login');
         return;
       }
-      await axios.post(
-        'http://localhost:3000/api/tasks',
-        { title, description, priority, status, dueDate },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await createTask({ title, description, priority, status, dueDate });
       navigate('/tasks');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create task');

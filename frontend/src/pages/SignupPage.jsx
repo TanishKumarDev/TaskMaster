@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { signup } from '../api/taskApi';
 
 const SignupPage = () => {
   const [name, setName] = useState('');
@@ -12,12 +12,7 @@ const SignupPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/register', {
-        name,
-        email,
-        password,
-      });
-      localStorage.setItem('token', response.data.token);
+      await signup(name, email, password);
       navigate('/tasks');
     } catch (err) {
       setError(err.response?.data?.message || 'Signup failed');

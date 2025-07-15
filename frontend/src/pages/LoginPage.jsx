@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { login } from '../api/taskApi';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -11,11 +11,7 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/login', {
-        email,
-        password,
-      });
-      localStorage.setItem('token', response.data.token);
+      await login(email, password);
       navigate('/tasks');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');

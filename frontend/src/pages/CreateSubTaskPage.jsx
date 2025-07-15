@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import { addSubTask } from '../api/taskApi';
 
 const CreateSubTaskPage = () => {
   const [title, setTitle] = useState('');
@@ -25,11 +25,7 @@ const CreateSubTaskPage = () => {
         navigate('/login');
         return;
       }
-      await axios.post(
-        `http://localhost:3000/api/tasks/${taskId}/subtasks`,
-        { title, status },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await addSubTask(taskId, { title, status });
       navigate('/tasks');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create sub-task');
